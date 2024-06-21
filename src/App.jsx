@@ -1,50 +1,62 @@
 import { useState } from "react"
 
-export default function App(){
+export default function App() {
 
-  const [games, setGames] = useState([])
+  const [games, setGames] = useState(() => {
+    const storedGames = localStorage.getItem('obc-game-lib')
+    if(!storedGames) return []
+    return JSON.parse(storedGames)
+  })
   const [title, setTitle] = useState('')
   const [coverImg, setCoverImg] = useState('')
 
   const handleSubmit = (ev) => {
     ev.preventDefault()
 
-    addGame({title, coverImg})
+    addGame({ title, coverImg })
 
     setTitle('')
     setCoverImg('')
   }
 
-  const addGame = ({title, coverImg}) => {
+  const addGame = ({ title, coverImg }) => {
     const id = Math.floor(Math.random() * 1000000)
-    const game = {id, title, coverImg}
-    setGames(state => [...state, game])
+    const game = { id, title, coverImg }
+    setGames(state => {
+      const newState = [...state, game]
+      localStorage.setItem('obc-game-lib', JSON.stringify(newState))
+      return newState
+    })
   }
 
   const removeGame = (id) => {
-    setGames(state => state.filter(game => game.id !== id ))
+    setGames(state => {
+      const newState = state.filter(game => game.id !== id)
+      localStorage.setItem('obc-game-lib', JSON.stringify(newState))
+      return newState
+    })
   }
 
-  return(
+  return (
     <div className="app">
       <h1>HoloNet Game Store</h1>
       <form onSubmit={handleSubmit} action="">
         <div>
           <label htmlFor="title">Título</label>
-          <input 
-            type="text" 
-            name="title" 
-            id="title" 
+          <input
+            type="text"
+            name="title"
+            id="title"
             value={title}
             onChange={(ev) => setTitle(ev.target.value)}
           />
         </div>
         <div>
           <label htmlFor="coverImg">Imagem da Capa</label>
-          <input 
-            type="text" 
-            name="coverImg" 
-            id="coverImg" 
+          <input
+            type="text"
+            name="coverImg"
+            id="coverImg"
             value={coverImg}
             onChange={(ev) => setCoverImg(ev.target.value)}
           />
